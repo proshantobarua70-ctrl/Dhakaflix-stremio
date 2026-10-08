@@ -1,0 +1,53 @@
+```yaml
+name: Import Catalog to D1
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check catalog file
+        run: |
+          if [ ! -f data.json.gz ]; then
+            echo "ERROR: data.json.gz not found"
+            exit 1
+          fi
+
+          SIZE=$(stat -c%s data.json.gz)
+          echo "Catalog file size: $SIZE bytes"
+
+          if [ "$SIZE" -lt 100 ]; then
+            echo "ERROR: data.json.gz is only a placeholder"
+            exit 1
+          fi
+
+      - name: Check import script
+        run: |
+          if [ ! -f import-to-d1.js ]; then
+            echo "ERROR: import-to-d1.js not found"
+            exit 1
+          fi
+
+          echo "Import script found."
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run D1 import
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
+        run: node import-to-d1.js
+```
