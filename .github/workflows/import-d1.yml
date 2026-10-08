@@ -10,7 +10,6 @@ permissions:
 jobs:
   import:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,10 +20,8 @@ jobs:
             echo "ERROR: data.json.gz not found"
             exit 1
           fi
-
           SIZE=$(stat -c%s data.json.gz)
           echo "Catalog file size: $SIZE bytes"
-
           if [ "$SIZE" -lt 100 ]; then
             echo "ERROR: data.json.gz is only a placeholder"
             exit 1
@@ -36,7 +33,6 @@ jobs:
             echo "ERROR: import-to-d1.js not found"
             exit 1
           fi
-
           echo "Import script found."
 
       - name: Setup Node.js
